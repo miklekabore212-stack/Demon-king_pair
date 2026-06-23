@@ -1,27 +1,17 @@
 {
-  "name": "demon-kinv-md",
+  "name": "slimesc",
   "version": "1.0.0",
-  "description": "Demon King MD - WhatsApp Pair Code Generator",
-  "main": "index.js",
-  "type": "module",
-  "engines": {
-    "node": ">=20.0.0"
-  },
+  "description": "SlimeSc Pro Downloader API & UI",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "build": "echo 'No build step required'"
+    "start": "node server.js"
   },
-  "author": "Mr Unique Hacker",
-  "license": "ISC",
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.21",
-    "awesome-phonenumber": "7.2.0",
-    "body-parser": "^1.20.3",
-    "express": "^4.21.2",
-    "path": "^0.12.7",
-    "phone": "3.1.55",
-    "pino": "9.5.0",
-    "qrcode": "^1.5.4",
-    "qrcode-terminal": "^0.12.0"
+    "axios": "^1.6.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
