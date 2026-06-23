@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SlimeSc — Téléchargement Multi-Plateformes Pro</title>
+<meta name="description" content="SlimeSc : téléchargez sans filigrane vos vidéos YouTube, TikTok, Instagram, Snapchat en HD et les fichiers GitHub.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;400;600;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --bg:#050a0e; --bg-2:#0a1419; --fg:#e8fff5; --muted:#6b8a85;
+    --accent:#00ff9d; --accent-2:#00d9ff; --accent-3:#ff3d8b;
+    --accent-yt:#ff4444; --accent-tk:#00f2ea; --accent-ig:#e1306c; --accent-sc:#fffc00;
+    --card:rgba(15, 30, 35, 0.55); --border:rgba(0, 255, 157, 0.15);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden;line-height:1.6}
+  
+  /* Background Effects */
+  .grid-overlay{position:fixed;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(0,255,157,0.04) 1px, transparent 1px),linear-gradient(90deg, rgba(0,255,157,0.04) 1px, transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%)}
+  .glow-orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:0.5;z-index:0;pointer-events:none;animation:float 18s ease-in-out infinite}
+  .glow-orb.o1{width:500px;height:500px;background:radial-gradient(circle,#00ff9d 0%,transparent 70%);top:-100px;left:-100px;}
+  .glow-orb.o2{width:600px;height:600px;background:radial-gradient(circle,#00d9ff 0%,transparent 70%);bottom:-200px;right:-150px;animation-delay:-9s}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,-40px) scale(1.1)}66%{transform:translate(-40px,50px) scale(0.95)}}
+
+  .container{max-width:1280px;margin:0 auto;padding:0 24px;position:relative;z-index:10}
+  header{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(5,10,14,0.7);border-bottom:1px solid var(--border)}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+  .logo-wrap{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;color:var(--fg)}
+  .logo-svg{width:44px;height:44px;transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 0 12px rgba(0,255,157,0.5))}
+  .logo-wrap:hover .logo-svg{transform:rotate(-10deg) scale(1.1)}
+  .logo-text{font-family:'Sora',sans-serif;font-weight:800;font-size:22px;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  nav.main-nav{display:flex;gap:8px;align-items:center}
+  nav.main-nav a{color:var(--muted);text-decoration:none;padding:8px 16px;border-radius:10px;font-size:14px;font-weight:500;transition:all 0.3s}
+  nav.main-nav a:hover{color:var(--fg);background:rgba(0,255,157,0.06)}
+  .nav-cta{background:linear-gradient(135deg,var(--accent),var(--accent-2))!important;color:#001a14!important;font-weight:600!important;box-shadow:0 4px 20px rgba(0,255,157,0.3)}
+  .menu-btn{display:none;background:none;border:none;color:var(--fg);font-size:24px;cursor:pointer}
+
+  .hero{padding:80px 0 60px}
+  .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:center}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--border);border-radius:100px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--accent);background:rgba(0,255,157,0.05);margin-bottom:24px}
+  .pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,255,157,0.7)}70%{box-shadow:0 0 0 10px rgba(0,255,157,0)}100%{box-shadow:0 0 0 0 rgba(0,255,157,0)}}
+  h1.hero-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(40px,5.5vw,76px);line-height:1.02;letter-spacing:-2px;margin:0 0 24px}
+  .hero-title .gradient{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 50%,var(--accent-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+  .hero-title .stroke{-webkit-text-stroke:1.5px var(--accent);color:transparent;display:inline-block}
+  .hero-sub{font-size:18px;color:var(--muted);max-width:520px;margin-bottom:36px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:14px;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer;border:none;transition:all 0.3s;font-family:'Outfit',sans-serif}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001a14;box-shadow:0 8px 30px rgba(0,255,157,0.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,255,157,0.5)}
+  .btn-ghost{background:rgba(255,255,255,0.04);color:var(--fg);border:1px solid var(--border)}
+  .btn-ghost:hover{background:rgba(0,255,157,0.08);border-color:var(--accent)}
+
+  .section{padding:60px 0}
+  .section-head{text-align:center;margin-bottom:50px}
+  .section-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+  .section-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(32px,4vw,52px);line-height:1.05;letter-spacing:-1.5px;margin:0 0 16px}
+  .section-desc{color:var(--muted);max-width:600px;margin:0 auto;font-size:16px}
+
+  .downloader-wrap{background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:28px;padding:36px;box-shadow:0 20px 80px rgba(0,0,0,0.4);position:relative;overflow:hidden}
+  .downloader-wrap::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg, transparent 0deg, rgba(0,255,157,0.08) 60deg, transparent 120deg);animation:rotate 8s linear infinite;pointer-events:none}
+  @keyframes rotate{to{transform:rotate(360deg)}}
+  .downloader-inner{position:relative;z-index:2}
+
+  .platform-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:24px;scrollbar-width:none}
+  .ptab{flex:1;min-width:120px;padding:16px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;cursor:pointer;transition:all 0.3s;text-align:center;color:var(--muted);font-weight:500;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .ptab i{font-size:22px;transition:transform 0.3s}
+  .ptab:hover{color:var(--fg);transform:translateY(-2px)}
+  .ptab.active{background:linear-gradient(135deg,rgba(0,255,157,0.12),rgba(0,217,255,0.08));border-color:var(--accent);color:var(--fg);box-shadow:0 8px 30px rgba(0,255,157,0.15)}
+  .ptab[data-platform="youtube"].active{border-color:var(--accent-yt)}.ptab[data-platform="youtube"].active i{color:var(--accent-yt)}
+  .ptab[data-platform="tiktok"].active{border-color:var(--accent-tk)}.ptab[data-platform="tiktok"].active i{color:var(--accent-tk)}
+  .ptab[data-platform="instagram"].active{border-color:var(--accent-ig)}.ptab[data-platform="instagram"].active i{color:var(--accent-ig)}
+  .ptab[data-platform="snapchat"].active{border-color:var(--accent-sc)}.ptab[data-platform="snapchat"].active i{color:var(--accent-sc)}
+  .ptab[data-platform="github"].active{border-color:#a0a8b0}.ptab[data-platform="github"].active i{color:#c9d1d9}
+
+  .input-row{display:flex;gap:14px;flex-wrap:wrap}
+  .input-wrap{flex:1;min-width:260px;position:relative}
+  .input-wrap i.input-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
+  .url-input{width:100%;padding:18px 20px 18px 48px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:14px;color:var(--fg);font-size:15px;font-family:'JetBrains Mono',monospace;outline:none;transition:all 0.3s}
+  .url-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(0,255,157,0.1)}
+  .btn-download{padding:18px 32px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001a14;border:none;border-radius:14px;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.3s;box-shadow:0 8px 30px rgba(0,255,157,0.3);font-family:'Outfit',sans-serif;white-space:nowrap}
+  .btn-download:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,255,157,0.45)}
+  .btn-download.loading{pointer-events:none;opacity:0.85}
+  .btn-download.loading .btn-text{display:none}
+  .btn-download.loading .btn-loader{display:inline-block}
+  .btn-loader{display:none;width:18px;height:18px;border:2.5px solid #001a14;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .format-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
+  .format-label{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;margin-right:6px}
+  .format-chip{padding:8px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;font-size:13px;cursor:pointer;transition:all 0.25s;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:6px}
+  .format-chip:hover{color:var(--fg);border-color:var(--accent)}
+  .format-chip.active{background:rgba(0,255,157,0.12);border-color:var(--accent);color:var(--accent)}
+  .quality-chip.active{background:rgba(0,217,255,0.12);border-color:var(--accent-2);color:var(--accent-2)}
+
+  .result-area{margin-top:24px}
+  .result-card{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;gap:20px;align-items:center;animation:slideIn 0.5s}
+  @keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .result-thumb{width:120px;height:80px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#001a14;font-size:32px;object-fit:cover}
+  .result-info{flex:1;min-width:0}
+  .result-title{font-weight:600;font-size:15px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .result-meta{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;display:flex;gap:14px;flex-wrap:wrap}
+  .btn-sm{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;gap:6px;transition:all 0.25s;text-decoration:none}
+  .btn-sm.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001a14}
+  .btn-sm.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,255,157,0.4)}
+  .error-msg{background:rgba(255,61,139,0.08);border:1px solid rgba(255,61,139,0.3);color:#ff8db5;padding:14px 18px;border-radius:12px;font-size:14px;display:flex;align-items:center;gap:10px;animation:slideIn 0.4s}
+
+  .community{background:linear-gradient(135deg,rgba(0,255,157,0.05),rgba(0,217,255,0.03));border:1px solid var(--border);border-radius:28px;padding:48px;text-align:center;position:relative;overflow:hidden}
+  .community h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(28px,3.5vw,44px);margin:0 0 14px;letter-spacing:-1px}
+  .community p{color:var(--muted);margin-bottom:32px;font-size:16px}
+  .community-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+  .tg-card{display:flex;align-items:center;gap:16px;padding:18px 28px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:16px;text-decoration:none;color:var(--fg);transition:all 0.3s;min-width:280px}
+  .tg-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 10px 40px rgba(0,255,157,0.2)}
+  .tg-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#2aabee,#229ed9);display:flex;align-items:center;justify-content:center;font-size:22px;color:white}
+  .tg-info{text-align:left}
+  .tg-name{font-weight:600;font-size:14px;margin-bottom:2px}
+  .tg-handle{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+  footer{border-top:1px solid var(--border);padding:40px 0;margin-top:60px}
+  .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+
+  .toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:10px;max-width:360px}
+  .toast{background:rgba(15,30,35,0.95);backdrop-filter:blur(20px);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:14px 18px;color:var(--fg);font-size:14px;display:flex;align-items:center;gap:12px;animation:toastIn 0.4s;box-shadow:0 10px 40px rgba(0,0,0,0.4)}
+  .toast.error{border-left-color:var(--accent-3)}
+  .toast.error i{color:var(--accent-3)}
+  .toast i{font-size:18px;color:var(--accent)}
+  @keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  @media (max-width:980px){.hero-grid{grid-template-columns:1fr}.menu-btn{display:block}nav.main-nav{display:none}}
+  @media (max-width:640px){.container{padding:0 16px}.downloader-wrap{padding:24px 20px}.input-row{flex-direction:column}.btn-download{width:100%;justify-content:center}.result-card{flex-direction:column;align-items:flex-start}.result-thumb{width:100%;height:140px}}
+</style>
+</head>
+<body>
+
+<div class="grid-overlay"></div>
+<div class="glow-orb o1"></div>
+<div class="glow-orb o2"></div>
+
+<header>
+  <div class="container header-inner">
+    <a href="#" class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ff9d"/><stop offset="100%" stop-color="#00d9ff"/></linearGradient></defs>
+        <path d="M50 8 C 30 30, 18 50, 18 68 C 18 84, 32 94, 50 94 C 68 94, 82 84, 82 68 C 82 50, 70 30, 50 8 Z" fill="url(#lg1)"/>
+        <path d="M62 38 C 58 33, 50 32, 44 35 C 38 38, 36 45, 42 50 C 46 53, 54 53, 58 56 C 62 59, 60 66, 54 67 C 48 68, 42 66, 39 62" stroke="#001a14" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <circle cx="38" cy="45" r="4" fill="#ffffff" opacity="0.6"/>
+      </svg>
+      <span class="logo-text">SlimeSc</span>
+    </a>
+    <nav class="main-nav">
+      <a href="#downloader">Télécharger</a>
+      <a href="#community">Communauté</a>
+      <a href="#community" class="nav-cta">Telegram</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><i class="fas fa-bars"></i></button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge"><span class="pulse-dot"></span><span>V2.4 — SANS FILIGRANE • HD ULTRA</span></div>
+        <h1 class="hero-title">Téléchargez<br><span class="gradient">sans limites.</span><br><span class="stroke">Sans filigrane.</span></h1>
+        <p class="hero-sub">SlimeSc récupère vos vidéos YouTube, TikTok, Instagram, Snapchat et vos fichiers GitHub en qualité maximale. Rapide, propre, sans inscription.</p>
+        <div class="hero-cta">
+          <a href="#downloader" class="btn btn-primary"><i class="fas fa-rocket"></i> Commencer</a>
+          <a href="#community" class="btn btn-ghost"><i class="fab fa-telegram"></i> Rejoindre</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="downloader">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">// DOWNGRADE_ENGINE_V2</div>
+      <h2 class="section-title">Coller. Choisir. Télécharger.</h2>
+      <p class="section-desc">Une interface unique pour 5 plateformes. Sans pub intrusive, sans redirection, sans complication.</p>
+    </div>
+    <div class="downloader-wrap">
+      <div class="downloader-inner">
+        <div class="platform-tabs" role="tablist">
+          <button class="ptab active" data-platform="youtube" role="tab"><i class="fab fa-youtube"></i><span>YouTube</span></button>
+          <button class="ptab" data-platform="tiktok" role="tab"><i class="fab fa-tiktok"></i><span>TikTok</span></button>
+          <button class="ptab" data-platform="instagram" role="tab"><i class="fab fa-instagram"></i><span>Instagram</span></button>
+          <button class="ptab" data-platform="snapchat" role="tab"><i class="fab fa-snapchat-ghost"></i><span>Snapchat</span></button>
+          <button class="ptab" data-platform="github" role="tab"><i class="fab fa-github"></i><span>GitHub</span></button>
+        </div>
+
+        <div class="input-row">
+          <div class="input-wrap">
+            <input type="text" class="url-input" id="urlInput" placeholder="https://youtube.com/watch?v=..." autocomplete="off">
+            <i class="fas fa-link input-icon"></i>
+          </div>
+          <button class="btn-download" id="downloadBtn">
+            <span class="btn-text"><i class="fas fa-magnifying-glass"></i> Analyser</span>
+            <span class="btn-loader"></span>
+          </button>
+        </div>
+
+        <div class="format-row" id="formatRow">
+          <span class="format-label">Format</span>
+          <button class="format-chip active" data-format="mp4"><i class="fas fa-film"></i> MP4</button>
+          <button class="format-chip" data-format="mp3"><i class="fas fa-music"></i> MP3</button>
+        </div>
+
+        <div class="format-row" id="qualityRow">
+          <span class="format-label">Qualité</span>
+          <button class="format-chip quality-chip" data-quality="360p">360p</button>
+          <button class="format-chip quality-chip active" data-quality="720p">720p</button>
+          <button class="format-chip quality-chip" data-quality="1080p">1080p HD</button>
+          <button class="format-chip quality-chip" data-quality="4k">4K Ultra</button>
+        </div>
+
+        <div class="result-area" id="resultArea"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="community">
+  <div class="container">
+    <div class="community">
+      <h2>Rejoignez la communauté SlimeSc</h2>
+      <p>Mod APK, astuces tech, support et mises à jour en temps réel sur nos canaux Telegram officiels.</p>
+      <div class="community-links">
+        <a href="https://t.me/APK_MOD_BY_STE" target="_blank" rel="noopener" class="tg-card">
+          <div class="tg-icon"><i class="fab fa-telegram"></i></div>
+          <div class="tg-info"><div class="tg-name">APK MOD BY STE</div><div class="tg-handle">@APK_MOD_BY_STE</div></div>
+          <i class="fas fa-arrow-right" style="color:var(--accent)"></i>
+        </a>
+        <a href="https://t.me/SLIME_TECH_EMPIRE" target="_blank" rel="noopener" class="tg-card">
+          <div class="tg-icon"><i class="fab fa-telegram"></i></div>
+          <div class="tg-info"><div class="tg-name">Slime Tech Empire</div><div class="tg-handle">@SLIME_TECH_EMPIRE</div></div>
+          <i class="fas fa-arrow-right" style="color:var(--accent)"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>SlimeSc © 2025 — Téléchargement multi-plateformes pro.</span>
+    <div style="display:flex;gap:24px"><a href="#downloader" style="color:var(--muted)">Télécharger</a><a href="#community" style="color:var(--muted)">Support</a></div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const tabs = document.querySelectorAll('.ptab');
+const urlInput = document.getElementById('urlInput');
+const qualityRow = document.getElementById('qualityRow');
+let currentPlatform = 'youtube';
+let currentFormat = 'mp4';
+let currentQuality = '720p';
+
+const placeholders = {
+  youtube: 'https://youtube.com/watch?v=...',
+  tiktok: 'https://tiktok.com/@user/video/...',
+  instagram: 'https://instagram.com/reel/...',
+  snapchat: 'https://snapchat.com/p/...',
+  github: 'https://github.com/user/repo (Dépôt, Fichier ou Release)'
+};
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentPlatform = tab.dataset.platform;
+    urlInput.placeholder = placeholders[currentPlatform];
+    document.getElementById('resultArea').innerHTML = '';
+    qualityRow.style.display = currentPlatform === 'github' ? 'none' : 'flex';
+  });
+});
+
+document.querySelectorAll('.format-chip:not(.quality-chip)').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.format-chip:not(.quality-chip)').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFormat = chip.dataset.format;
+  });
+});
+
+document.querySelectorAll('.quality-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.quality-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentQuality = chip.dataset.quality;
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', handleAnalyze);
+urlInput.addEventListener('keypress', e => { if(e.key === 'Enter') handleAnalyze(); });
+
+async function handleAnalyze() {
+  const url = urlInput.value.trim();
+  if (!url) return showToast('Veuillez coller un lien valide.', 'error');
+
+  const btn = document.getElementById('downloadBtn');
+  const resultArea = document.getElementById('resultArea');
+  
+  btn.classList.add('loading');
+  resultArea.innerHTML = '';
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, platform: currentPlatform, format: currentFormat, quality: currentQuality })
+    });
+    
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error || 'Erreur d\'analyse');
+
+    resultArea.innerHTML = `
+      <div class="result-card">
+        <div class="result-thumb" style="background:linear-gradient(135deg,var(--accent),var(--accent-2))">
+          <i class="fab fa-${currentPlatform}"></i>
+        </div>
+        <div class="result-info">
+          <div class="result-title">${data.title || 'Téléchargement Prêt'}</div>
+          <div class="result-meta">
+            <span><i class="fas fa-user"></i> ${data.author || 'SlimeSc'}</span>
+            <span><i class="fas fa-file"></i> ${currentFormat.toUpperCase()}</span>
+            ${currentPlatform !== 'github' ? `<span><i class="fas fa-gauge-high"></i> ${currentQuality}</span>` : ''}
+            <span style="color:var(--accent)"><i class="fas fa-check-circle"></i> Sans filigrane</span>
+          </div>
+        </div>
+        <a href="${data.url}" class="btn-sm primary" target="_blank" download>
+          <i class="fas fa-download"></i> Télécharger
+        </a>
+      </div>`;
+    showToast('Lien sécurisé récupéré ! Cliquez pour télécharger.', 'success');
+
+  } catch (error) {
+    resultArea.innerHTML = `<div class="error-msg"><i class="fas fa-circle-exclamation"></i><span>${error.message}</span></div>`;
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
+function showToast(msg, type='success') {
+  const container = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i><span>${msg}</span>`;
+  container.appendChild(t);
+  setTimeout(() => { t.style.animation = 'toastIn 0.4s reverse'; setTimeout(()=>t.remove(), 400); }, 3500);
+}
+</script>
+</body>
+</html>
